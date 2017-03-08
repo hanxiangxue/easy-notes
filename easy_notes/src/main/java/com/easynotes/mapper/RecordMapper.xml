@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easynotes.dao.RecordDao">
+	<resultMap id="BaseResultMap" type="com.easynotes.core.model.Record">
+		<id column="entry" jdbcType="VARCHAR" property="entry" />
+		<id column="dictionary_id" jdbcType="INTEGER" property="dictionaryId" />
+		<result column="state" jdbcType="INTEGER" property="state" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+	</resultMap>
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
+		type="com.easynotes.core.model.Record">
+		<result column="paraphrase" jdbcType="LONGVARCHAR" property="paraphrase" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		entry, dictionary_id, state, create_time, update_time
+	</sql>
+	<sql id="Blob_Column_List">
+		paraphrase
+	</sql>
+	<select id="queryByPrimaryKey" parameterType="com.easynotes.core.model.RecordKey"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from t_record
+		where entry = #{entry,jdbcType=VARCHAR}
+		and dictionary_id
+		= #{dictionaryId,jdbcType=INTEGER}
+	</select>
+
+	<insert id="insert" parameterType="com.easynotes.core.model.Record">
+		insert into t_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="entry != null">
+				entry,
+			</if>
+			<if test="dictionaryId != null">
+				dictionary_id,
+			</if>
+			<if test="state != null">
+				state,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="paraphrase != null">
+				paraphrase,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="entry != null">
+				#{entry,jdbcType=VARCHAR},
+			</if>
+			<if test="dictionaryId != null">
+				#{dictionaryId,jdbcType=INTEGER},
+			</if>
+			<if test="state != null">
+				#{state,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="paraphrase != null">
+				#{paraphrase,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.easynotes.core.model.Record">
+		update t_record
+		<set>
+			<if test="state != null">
+				state = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="paraphrase != null">
+				paraphrase = #{paraphrase,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where entry = #{entry,jdbcType=VARCHAR}
+		and dictionary_id =
+		#{dictionaryId,jdbcType=INTEGER}
+		and state=1
+	</update>
+	<update id="delete" parameterType="com.easynotes.core.model.RecordKey">
+		update t_record set state=0
+		where entry = #{entry,jdbcType=VARCHAR}
+		and dictionary_id =
+		#{dictionaryId,jdbcType=INTEGER} and state=1
+	</update>
+	<update id="deleteBatch">
+		update t_record set state=0
+		where entry in
+		<foreach collection="entries" open="(" close=")" separator=","
+			item="item">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+		and
+		dictionary_id =
+		#{dictionaryId,jdbcType=INTEGER} and state=1
+
+	</update>
+	<select id="queryForPages" resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from t_record
+		where dictionary_id
+		= #{dictionaryId,jdbcType=INTEGER}
+		and
+		entry like concat("%",#{entry,jdbcType=VARCHAR},"%")
+		order by entry
+	</select>
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easynotes.dao.UserDao">
+	<resultMap id="BaseResultMap" type="com.easynotes.core.model.User">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="name" jdbcType="VARCHAR" property="name" />
+		<result column="password" jdbcType="VARCHAR" property="password" />
+		<result column="state" jdbcType="INTEGER" property="state" />
+		<result column="role_id" jdbcType="INTEGER" property="roleId" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, name, password, state, role_id, create_time,
+		last_login_time
+	</sql>
+	<select id="queryById" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_user
+		where id = #{id,jdbcType=INTEGER}
+		and state=1
+	</select>
+	<select id="findUserByName" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_user
+		where name = #{userName,jdbcType=VARCHAR}
+		
+	</select>
+	<insert id="insert" parameterType="com.easynotes.core.model.User">
+
+
+		insert into t_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="password != null">
+				password,
+			</if>
+			<if test="state != null">
+				state,
+			</if>
+			<if test="roleId != null">
+				role_id,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="lastLoginTime != null">
+				last_login_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				#{state,jdbcType=INTEGER},
+			</if>
+			<if test="roleId != null">
+				#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastLoginTime != null">
+				#{lastLoginTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<update id="update" parameterType="com.easynotes.core.model.User">
+		update t_user
+		<set>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				password = #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				state = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="roleId != null">
+				role_id = #{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastLoginTime != null">
+				last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER} and state=1
+	</update>
+	<update id="delete">
+		update t_user set state=0 where
+		Id=#{id,jdbcType=INTEGER} and state=1
+	</update>
+	<update id="updateLastLoginTime">
+		update t_user set last_login_time=now() where
+		Id=#{id,jdbcType=INTEGER} and state=1
+	</update>
+</mapper>
